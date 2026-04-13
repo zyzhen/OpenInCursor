@@ -8,23 +8,24 @@ using Task = System.Threading.Tasks.Task;
 namespace OpenInCursor
 {
     /// <summary>
-    /// Code editor context menu command: "Open in Cursor".
+    /// Code editor context menu command: "Open in Claude".
+    /// Opens the current file in VS Code and triggers the Claude Code extension panel.
     /// </summary>
-    internal sealed class OpenInCursorCommand
+    internal sealed class OpenInClaudeCommand
     {
         /// <summary>
         /// Command ID.
         /// </summary>
-        public const int CommandId = 0x0100;
+        public const int CommandId = 0x0200;
 
         /// <summary>
-        /// Command menu group (command set GUID) - dedicated Cursor command set.
+        /// Command menu group (command set GUID) - dedicated Claude command set.
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("78663741-69ae-455a-a6a5-13487a765188");
+        public static readonly Guid CommandSet = new Guid("9a6046a9-547d-4bdd-ac2c-68f41e75f776");
 
         private readonly AsyncPackage package;
 
-        private OpenInCursorCommand(AsyncPackage package, OleMenuCommandService commandService)
+        private OpenInClaudeCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
             this.package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
@@ -34,7 +35,7 @@ namespace OpenInCursor
             commandService.AddCommand(menuItem);
         }
 
-        public static OpenInCursorCommand Instance { get; private set; }
+        public static OpenInClaudeCommand Instance { get; private set; }
 
         private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => this.package;
 
@@ -45,7 +46,7 @@ namespace OpenInCursor
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
-                Instance = new OpenInCursorCommand(package, commandService);
+                Instance = new OpenInClaudeCommand(package, commandService);
             }
         }
 
@@ -64,7 +65,7 @@ namespace OpenInCursor
                 var dte = await ServiceProvider.GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
                 if (dte == null)
                 {
-                    EditorUtility.ShowErrorMessage(this.package, "Could not access Visual Studio DTE service.", "Open in Cursor");
+                    EditorUtility.ShowErrorMessage(this.package, "Could not access Visual Studio DTE service.", "Open in Claude");
                     return;
                 }
 
@@ -77,22 +78,22 @@ namespace OpenInCursor
                         int currentLine = selection?.CurrentLine ?? 1;
                         int currentColumn = selection?.CurrentColumn ?? 1;
 
-                        EditorUtility.OpenInEditor(this.package, EditorType.Cursor, filePath, currentLine, currentColumn);
+                        EditorUtility.OpenInClaude(this.package, filePath, currentLine, currentColumn);
                     }
                     else
                     {
-                        EditorUtility.ShowWarningMessage(this.package, "Active document file not found.", "Open in Cursor");
+                        EditorUtility.ShowWarningMessage(this.package, "Active document file not found.", "Open in Claude");
                     }
                 }
                 else
                 {
-                    EditorUtility.ShowWarningMessage(this.package, "No active document found.", "Open in Cursor");
+                    EditorUtility.ShowWarningMessage(this.package, "No active document found.", "Open in Claude");
                 }
             }
             catch (Exception ex)
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                EditorUtility.ShowErrorMessage(this.package, $"An error occurred: {ex.Message}", "Open in Cursor");
+                EditorUtility.ShowErrorMessage(this.package, $"An error occurred: {ex.Message}", "Open in Claude");
             }
         }
     }

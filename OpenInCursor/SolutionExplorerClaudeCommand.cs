@@ -8,31 +8,32 @@ using Task = System.Threading.Tasks.Task;
 namespace OpenInCursor
 {
     /// <summary>
-    /// Solution Explorer context menu commands: "Open in Cursor" for files, folders, projects, and solutions.
+    /// Solution Explorer context menu commands: "Open in Claude" for files, folders, projects, and solutions.
+    /// Opens items in VS Code and triggers the Claude Code extension panel.
     /// </summary>
-    internal sealed class SolutionExplorerCommand
+    internal sealed class SolutionExplorerClaudeCommand
     {
-        public const int OpenInCursorFileId = 0x0101;
-        public const int OpenInCursorFolderId = 0x0102;
-        public const int OpenInCursorProjectId = 0x0103;
-        public const int OpenInCursorSolutionId = 0x0104;
+        public const int OpenInClaudeFileId = 0x0201;
+        public const int OpenInClaudeFolderId = 0x0202;
+        public const int OpenInClaudeProjectId = 0x0203;
+        public const int OpenInClaudeSolutionId = 0x0204;
 
         /// <summary>
-        /// Command menu group (command set GUID) - dedicated Cursor command set.
+        /// Command menu group (command set GUID) - dedicated Claude command set.
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("78663741-69ae-455a-a6a5-13487a765188");
+        public static readonly Guid CommandSet = new Guid("9a6046a9-547d-4bdd-ac2c-68f41e75f776");
 
         private readonly AsyncPackage package;
 
-        private SolutionExplorerCommand(AsyncPackage package, OleMenuCommandService commandService)
+        private SolutionExplorerClaudeCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
             this.package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-            AddCommand(commandService, OpenInCursorFileId, ExecuteFileCommand);
-            AddCommand(commandService, OpenInCursorFolderId, ExecuteFolderCommand);
-            AddCommand(commandService, OpenInCursorProjectId, ExecuteProjectCommand);
-            AddCommand(commandService, OpenInCursorSolutionId, ExecuteSolutionCommand);
+            AddCommand(commandService, OpenInClaudeFileId, ExecuteFileCommand);
+            AddCommand(commandService, OpenInClaudeFolderId, ExecuteFolderCommand);
+            AddCommand(commandService, OpenInClaudeProjectId, ExecuteProjectCommand);
+            AddCommand(commandService, OpenInClaudeSolutionId, ExecuteSolutionCommand);
         }
 
         private void AddCommand(OleMenuCommandService commandService, int commandId, EventHandler handler)
@@ -42,7 +43,7 @@ namespace OpenInCursor
             commandService.AddCommand(menuItem);
         }
 
-        public static SolutionExplorerCommand Instance { get; private set; }
+        public static SolutionExplorerClaudeCommand Instance { get; private set; }
 
         public static async Task InitializeAsync(AsyncPackage package)
         {
@@ -51,7 +52,7 @@ namespace OpenInCursor
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
-                Instance = new SolutionExplorerCommand(package, commandService);
+                Instance = new SolutionExplorerClaudeCommand(package, commandService);
             }
         }
 
@@ -88,7 +89,7 @@ namespace OpenInCursor
                 string selectedPath = EditorUtility.GetSelectedItemPath();
                 if (string.IsNullOrEmpty(selectedPath))
                 {
-                    EditorUtility.ShowWarningMessage(this.package, "No item selected or unable to determine the path.", "Open in Cursor");
+                    EditorUtility.ShowWarningMessage(this.package, "No item selected or unable to determine the path.", "Open in Claude");
                     return;
                 }
 
@@ -99,12 +100,12 @@ namespace OpenInCursor
                     pathToOpen = Path.GetDirectoryName(selectedPath);
                 }
 
-                EditorUtility.OpenInEditor(this.package, EditorType.Cursor, pathToOpen);
+                EditorUtility.OpenInClaude(this.package, pathToOpen);
             }
             catch (Exception ex)
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                EditorUtility.ShowErrorMessage(this.package, $"An error occurred: {ex.Message}", "Open in Cursor");
+                EditorUtility.ShowErrorMessage(this.package, $"An error occurred: {ex.Message}", "Open in Claude");
             }
         }
     }

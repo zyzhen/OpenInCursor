@@ -48,8 +48,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OpenInCursorPackage.cs" />
     <Compile Include="OpenInCursorCommand.cs" />
+    <Compile Include="OpenInClaudeCommand.cs" />
     <Compile Include="SolutionExplorerCommand.cs" />
-    <Compile Include="CursorUtility.cs" />
+    <Compile Include="SolutionExplorerClaudeCommand.cs" />
+    <Compile Include="EditorUtility.cs" />
+    <Compile Include="OptionPage.cs" />
+    <Compile Include="CopyPositionCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
@@ -59,6 +63,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Design" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime">
@@ -85,6 +91,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="icons\extension-logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="icons\claude-icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
